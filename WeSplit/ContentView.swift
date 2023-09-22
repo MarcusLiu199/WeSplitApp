@@ -16,6 +16,8 @@ struct ContentView: View {
     
     let tipPercentages = [10, 15, 20, 25, 0]
     
+    let localCurrency: FloatingPointFormatStyle<Double>.Currency = .currency(code: Locale.current.currency?.identifier ?? "USD")
+    
     var totalPerPerson: Double {
         // Calcualte the total per person here
         let peopleCount = Double(numberOfPeople + 2)
@@ -28,13 +30,21 @@ struct ContentView: View {
         return amountPerPerson
     }
     
+    var totalAmount: Double {
+        // Calculate the total amount here
+        let tipSelection = Double(tipPercentage)
+        let tipValue = checkAmount / 100 * tipSelection
+        let grandTotal = checkAmount + tipValue
+        return grandTotal
+    }
+    
     var body: some View {
         NavigationView {
             Form {
                 Section {
                     TextField("Amount",
                               value: $checkAmount,
-                              format: .currency(code: Locale.current.currency?.identifier ?? "USD"))
+                              format: localCurrency)
                     // Use the number pad
                     .keyboardType(.decimalPad)
                     .focused($amountIsFocused)
@@ -48,17 +58,31 @@ struct ContentView: View {
                 
                 Section {
                     Picker("Tip percentage", selection: $tipPercentage) {
-                        ForEach(tipPercentages, id: \.self) {
-                            Text($0, format: .percent)
+//                        ForEach(tipPercentages, id: \.self) {
+//                            Text($0, format: .percent)
+//                        }
+                        // Challenge 3
+                        ForEach(0 ..< 101) {
+                            Text("\($0)%")
                         }
                     }
-                    .pickerStyle(.segmented)
+//                    .pickerStyle(.segmented)
+                    .pickerStyle(.navigationLink)
                 } header: {
                     Text("How much tip do you want to leave?")
                 }
                 
                 Section {
                     Text(totalPerPerson,
+//                         format: .currency(code: Locale.current.currency?.identifier ?? "USD")
+                         format: localCurrency
+                    )
+                } header: {
+                    Text("Amount per person")
+                }
+                
+                Section {
+                    Text(totalAmount,
                          format: .currency(code: Locale.current.currency?.identifier ?? "USD"))
                 }
             }
